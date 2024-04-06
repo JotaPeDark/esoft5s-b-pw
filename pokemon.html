@@ -14,30 +14,26 @@
     </header>
 
     <script>
-        window.onload = function () {
+        window.onload = async function () {
             const urlParams = new URLSearchParams(window.location.search);
             const evolucao = urlParams.get('evolucao');
+
+            // Definir o título da página
             document.title = evolucao ? `Página do ${evolucao}` : 'Página sem evolução definida';
-        };
-
-        window.onload = async function () {
-            const urlParams = new URLSearchParams(window.location.search);
-            const evolucao = urlParams.get('evolucao');
-
-            const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${evolucao}`);
-            const pokemonData = await response.json();
-            console.log(pokemonData);
-        };
-
-        window.onload = async function () {
-            const evolucao = new URLSearchParams(window.location.search).get('evolucao');
 
             if (evolucao) {
-                const pokemonData = await fetch(`https://pokeapi.co/api/v2/pokemon/${evolucao}`).then(response => response.json());
-                document.body.appendChild(Object.assign(document.createElement('img'), { src: pokemonData.sprites.front_default }));
+                // Fazer requisição à PokeAPI
+                const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${evolucao}`);
+                const pokemonData = await response.json();
+
+                // Criar elemento <img> e atribuir src
+                const img = document.createElement('img');
+                img.src = pokemonData.sprites.front_default;
+                document.body.appendChild(img);
             }
         };
     </script>
+
 
 
 
