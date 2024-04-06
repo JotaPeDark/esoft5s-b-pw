@@ -14,14 +14,32 @@
     </header>
 
     <script>
-        window.onload = function() {
+        window.onload = function () {
             const urlParams = new URLSearchParams(window.location.search);
             const evolucao = urlParams.get('evolucao');
             document.title = evolucao ? `Página do ${evolucao}` : 'Página sem evolução definida';
         };
+
+        window.onload = async function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const evolucao = urlParams.get('evolucao');
+
+            const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${evolucao}`);
+            const pokemonData = await response.json();
+            console.log(pokemonData);
+        };
+
+        window.onload = async function () {
+            const evolucao = new URLSearchParams(window.location.search).get('evolucao');
+
+            if (evolucao) {
+                const pokemonData = await fetch(`https://pokeapi.co/api/v2/pokemon/${evolucao}`).then(response => response.json());
+                document.body.appendChild(Object.assign(document.createElement('img'), { src: pokemonData.sprites.front_default }));
+            }
+        };
     </script>
-    
-    
+
+
 
 
     <footer aria-label="Rodapé">
