@@ -15,17 +15,12 @@
 
     <script>
         window.onload = function() {
-            // Obtém o valor do parâmetro 'evolucao' da URL
-            var evolucao = new URLSearchParams(window.location.search).get('evolucao');
-            if (evolucao) {
-                // Define o título da página conforme o valor do parâmetro 'evolucao'
-                document.title = "Página do " + evolucao.charAt(0).toUpperCase() + evolucao.slice(1);
-            } else {
-                // Caso 'evolucao' não esteja definido, define um título padrão
-                document.title = "Página sem evolução definida";
-            }
+            const urlParams = new URLSearchParams(window.location.search);
+            const evolucao = urlParams.get('evolucao');
+            document.title = evolucao ? `Página do ${evolucao}` : 'Página sem evolução definida';
         };
     </script>
+    
     
 
 
