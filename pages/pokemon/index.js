@@ -1,95 +1,68 @@
 function changePageTitle(title) {
-  document.title = title;
+  document.title = title
 }
 
-// Função para obter a data formatada
-function getFormattedDate() {
-  const options = { year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' };
-  const formatter = new Intl.DateTimeFormat('pt-BR', options);
-  return formatter.format(new Date());
-}
-
-// Função para atualizar o contador de visitas e a última visita
-function updateVisitInfo() {
-  let visitas = localStorage.getItem("visitas");
-  let contador;
-  let ultimaVisita;
-
-  if (!visitas) {
-    contador = 0;
-    ultimaVisita = getFormattedDate();
-  } else {
-    const visitasObj = JSON.parse(visitas);
-    contador = visitasObj.count;
-    ultimaVisita = visitasObj.lastVisit;
-  }
-
-  contador++;
-  ultimaVisita = getFormattedDate();
-  localStorage.setItem("visitas", JSON.stringify({ count: contador, lastVisit: ultimaVisita }));
-
-  const footerParagraph = document.createElement('p');
-  footerParagraph.textContent = `Esta página foi visitada ${contador} vezes. A última visita foi: ${ultimaVisita}`;
-  document.querySelector('footer').appendChild(footerParagraph);
-}
-
-// Função para gerar a seção de informações do Pokémon
 function generateInfoSection(sprites, pokemonName) {
-  const h2 = document.createElement('h2');
-  h2.textContent = `Informações sobre ${pokemonName}`;
+  const imagens = Object.values(sprites)
+    .filter(sprite => typeof sprite === 'string')
 
-  const img = document.createElement('img');
-  img.alt = `Imagem do pokemon ${pokemonName}`;
+  const h2 = document.createElement('h2')
+  h2.id = "info-pokemon-label"
+  h2.textContent = `Informações sobre ${pokemonName}`
 
-  const section = document.getElementById('info-pokemon');
-  section.innerHTML = ''; // Limpa o conteúdo existente
+  const img = document.querySelector('img')
+  img.src = imagens[0]
+  img.alt = `Imagem do pokemon ${pokemonName}`
 
-  section.appendChild(h2);
+  const section = document.querySelector('#info-pokemon')
 
-  if (sprites.length > 0) {
-    let currentIndex = 0;
-    img.src = sprites[currentIndex];
+  section.appendChild(h2)
+  section.appendChild(img)
 
-    // Adiciona evento de clique para trocar de imagem
-    img.addEventListener('click', function () {
-      currentIndex = (currentIndex + 1) % sprites.length;
-      img.src = sprites[currentIndex];
-    });
+  let indiceAtual = 0;
 
-    section.appendChild(img);
-  } else {
-    const p = document.createElement('p');
-    p.textContent = 'Imagens não disponíveis';
-    section.appendChild(p);
-  }
+  img.addEventListener('click', () => {
+    indiceAtual = (indiceAtual + 1) % imagens.length;
+    img.src = imagens[indiceAtual];
+  });
 }
+
 
 async function getPokemonData(name) {
+  // fetch(`https://pokeapi.co/api/v2/pokemon/${name}`)
+  //   .then((fetchData) => {
+  //     return fetchData.json()
+  //   })
+  //   .then((jsonData) => generateInfoSection(jsonData.sprites.front_default, name))
+  //   .catch((error) => console.error(error))
+
   try {
-    const data = await fetch(`https://pokeapi.co/api/v2/pokemon/${name}`);
-    const jsonData = await data.json();
+    const data = await fetch(`https://pokeapi.co/api/v2/pokemon/${name}`)
 
-    // Transforma o objeto sprites em um array de links
-    const spritesArray = Object.values(jsonData.sprites)
-      .filter(sprite => typeof sprite === 'string');
+    const jsonData = await data.json()
 
-    generateInfoSection(spritesArray, name);
+    generateInfoSection(jsonData.sprites, name)
   } catch (error) {
-    console.error(error);
+    console.error(error)
   }
 }
 
 function getSearchParams() {
+  // Early return -> Caso location search, não faz nada.
   if (!location.search) {
-    return;
+    return
   }
 
-  const urlSearchParams = new URLSearchParams(location.search);
-  const pokemonName = urlSearchParams.get('name');
+  // URLSearchParams é uma classe que facilita a manipulação de query strings
+  const urlSearchParams = new URLSearchParams(location.search)
 
-  changePageTitle(`Página do ${pokemonName}`);
-  getPokemonData(pokemonName);
-  updateVisitInfo(); // Atualiza as informações de visita ao carregar a página
+  // Pegando o valor do parâmetro name
+  const pokemonName = urlSearchParams.get('name')
+
+  changePageTitle(`Pagina do ${pokemonName}`)
+  getPokemonData(pokemonName)
 }
 
-document.addEventListener('DOMContentLoaded', getSearchParams);
+document.addEventListener('DOMContentLoaded', function () {
+  getSearchParams()
+})
