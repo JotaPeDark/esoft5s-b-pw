@@ -1,36 +1,86 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TO DO</title>
     <style>
+        body {
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
 
-body {
-  display: grid;
-  grid-template-rows: auto 1fr auto;
-  min-height: 100vh;
-  margin: 0;
-  background-color: #f4f4f4;
-}
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 1rem;
+            text-align: center;
+        }
 
-header {
-  background-color: #333;
-  color: #fff;
-  padding: 1rem;
-  text-align: center;
-}
+        footer {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 1rem;
+        }
 
-footer {
-  background-color: #333;
-  color: #fff;
-  text-align: center;
-  padding: 1rem;
-}
+        #form {
+            display: grid;
+            gap: 1rem;
+            padding: 1rem;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin: 20px;
+        }
+
+        #form input[type="text"],
+        #form textarea {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        #form textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        #form input[type="submit"] {
+            background-color: #333;
+            color: #fff;
+            border: none;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        #form input[type="submit"]:hover {
+            background-color: #555;
+        }
+
+        .tarefa {
+            background-color: #fff;
+            border: 1px solid #ccc;
+            padding: 1rem;
+            margin: 10px 20px;
+            border-radius: 5px;
+        }
     </style>
 </head>
+
 <body>
-    <header id="header"></header>
+    <header id="header">
+        <nav>
+            <a href="./todo.html">TO DO</a>
+        </nav>
+    </header>
     <main id="main">
 
         <form id="form">
@@ -41,10 +91,55 @@ footer {
             <input type="submit" value="Enviar">
         </form>
 
+        <div id="tarefas"></div>
+
     </main>
-    <footer id="footer"></footer>
+    <footer id="footer">
+        <p>&copy; 2023 TO DO App. Todos os direitos reservados.</p>
+    </footer>
 </body>
 <script>
+    document.getElementById('form').addEventListener('submit', function (event) {
+        event.preventDefault();
+        const titulo = document.getElementById('titulo').value;
+        const descricao = document.getElementById('descricao').value;
 
+        if (titulo.trim() !== '' && descricao.trim() !== '') {
+            const tarefa = {
+                titulo: titulo,
+                descricao: descricao
+            };
+
+            let tarefas = JSON.parse(localStorage.getItem('tarefas')) || [];
+            tarefas.push(tarefa);
+            localStorage.setItem('tarefas', JSON.stringify(tarefas));
+
+            document.getElementById('titulo').value = '';
+            document.getElementById('descricao').value = '';
+
+            mostrarTarefas();
+        } else {
+            alert('Por favor, preencha todos os campos.');
+        }
+    });
+
+    function mostrarTarefas() {
+        const tarefas = JSON.parse(localStorage.getItem('tarefas')) || [];
+        const tarefasDiv = document.getElementById('tarefas');
+        tarefasDiv.innerHTML = '';
+
+        tarefas.forEach(function (tarefa, index) {
+            const div = document.createElement('div');
+            div.classList.add('tarefa');
+            div.innerHTML = `
+                <h3>${tarefa.titulo}</h3>
+                <p>${tarefa.descricao}</p>
+            `;
+            tarefasDiv.appendChild(div);
+        });
+    }
+
+    mostrarTarefas();
 </script>
+
 </html>
