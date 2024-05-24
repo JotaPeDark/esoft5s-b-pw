@@ -72,74 +72,134 @@
             margin: 10px 20px;
             border-radius: 5px;
         }
+
+        /* styles.css */
+
+        li {
+            position: relative;
+        }
+
+        li button.edit-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #676767;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+        }
+
+        li button.edit-btn:hover {
+            background-color: #575757;
+        }
     </style>
 </head>
 
 <body>
-    <header id="header">
-        <nav>
-            <a href="./todo.html">TO DO</a>
-        </nav>
-    </header>
-    <main id="main">
+    <div class="container">
+        <header>
+            <h1>Todo List</h1>
+        </header>
+        <main>
+            <!-- Formulário para adicionar tarefas -->
+            <form id="taskForm" onsubmit="addTask(event)">
+                <input type="text" name="title" id="title" required placeholder="Informe o título da tarefa" />
+                <textarea id="description" name="description" required
+                    placeholder="Informe a descrição da tarefa"></textarea>
+                <button type="submit">Salvar Tarefa</button>
+            </form>
 
-        <form id="form">
-            <label for="titulo">Título da Tarefa</label><br>
-            <input type="text" id="titulo" name="titulo" placeholder="Titulo"><br>
-            <label for="descricao">Descrição da Tarefa</label><br>
-            <textarea name="descricao" id="descricao" placeholder="Informe.."></textarea>
-            <input type="submit" value="Enviar">
-        </form>
+            <!-- Lista de tarefas -->
+            <ul id="taskList"></ul>
 
-        <div id="tarefas"></div>
+            <!-- Dialog para editar tarefas -->
+            <dialog id="editDialog">
+                <form id="editForm">
+                    <input type="text" name="editTitle" id="editTitle" required />
+                    <textarea id="editDescription" name="editDescription" required></textarea>
+                    <button type="submit">Editar</button>
+                    <button type="button" onclick="fecharDialog()">Cancelar</button>
+                </form>
+            </dialog>
+        </main>
+        <footer>&copy; 2024 Todo List</footer>
+    </div>
 
-    </main>
-    <footer id="footer">
-        <p>&copy; 2023 TO DO App. Todos os direitos reservados.</p>
-    </footer>
+    <script src="./index.js"></script>
+    <script src="../../footer-counter.js"></script>
 </body>
+
 <script>
-    document.getElementById('form').addEventListener('submit', function (event) {
-        event.preventDefault();
-        const titulo = document.getElementById('titulo').value;
-        const descricao = document.getElementById('descricao').value;
+    // JavaScript
 
-        if (titulo.trim() !== '' && descricao.trim() !== '') {
-            const tarefa = {
-                titulo: titulo,
-                descricao: descricao
-            };
+    const taskKey = "@tasks";
 
-            let tarefas = JSON.parse(localStorage.getItem('tarefas')) || [];
-            tarefas.push(tarefa);
-            localStorage.setItem('tarefas', JSON.stringify(tarefas));
+    // Função para adicionar tarefa
+    function addTask(event) {
+        event.preventDefault(); // Evita o recarregamento da página
+        const taskId = new Date().getTime();
+        const taskList = document.querySelector("#taskList");
 
-            document.getElementById('titulo').value = '';
-            document.getElementById('descricao').value = '';
+        const form = document.querySelector("#taskForm");
+        const formData = new FormData(form);
 
-            mostrarTarefas();
-        } else {
-            alert('Por favor, preencha todos os campos.');
-        }
-    });
+        const taskTitle = formData.get("title");
+        const taskDescription = formData.get("description");
 
-    function mostrarTarefas() {
-        const tarefas = JSON.parse(localStorage.getItem('tarefas')) || [];
-        const tarefasDiv = document.getElementById('tarefas');
-        tarefasDiv.innerHTML = '';
+        const li = document.createElement("li");
+        li.id = taskId;
+        li.innerHTML = `
+      <h2>${taskTitle}</h2>
+      <p>${taskDescription}</p>
+      <button class="edit-btn" title="Editar tarefa" onclick="abrirDialog(${taskId})">✏️</button>
+  `;
 
-        tarefas.forEach(function (tarefa, index) {
-            const div = document.createElement('div');
-            div.classList.add('tarefa');
-            div.innerHTML = `
-                <h3>${tarefa.titulo}</h3>
-                <p>${tarefa.descricao}</p>
-            `;
-            tarefasDiv.appendChild(div);
-        });
+        taskList.appendChild(li);
+
+        // Salvar tarefas no localStorage
+        const tasks = JSON.parse(localStorage.getItem(taskKey)) || [];
+        tasks.push({ id: taskId, title: taskTitle, description: taskDescription });
+        localStorage.setItem(taskKey, JSON.stringify(tasks));
+
+        form.reset();
     }
 
-    mostrarTarefas();
+    // Carregar tarefas do localStorage ao recarregar a página
+    window.addEventListener("DOMContentLoaded", () => {
+        const tasks = JSON.parse(localStorage.getItem(taskKey)) || [];
+        const taskList = document.querySelector("#taskList");
+        taskList.innerHTML = tasks
+            .map(
+                (task) =>
+                    `<li id="${task.id}"><h2>${task.title}</h2><p>${task.description}</p><button class="edit-btn" title="Editar tarefa" onclick="abrirDialog(${task.id})">✏️</button></li>`
+            )
+            .join("");
+    });
+
+    function abrirDialog(taskId) {
+        const dialog = document.querySelector("#editDialog");
+        const task = getTaskById(taskId);
+
+        if (task) {
+            const editForm = document.querySelector("#editForm");
+            editForm.elements["editTitle"].value = task.title;
+            editForm.elements["editDescription"].value = task.description;
+
+            dialog.showModal();
+        }
+    }
+
+    function fecharDialog() {
+        const dialog = document.querySelector("#editDialog");
+        dialog.close();
+    }
+
+    function getTaskById(taskId) {
+        const tasks = JSON.parse(localStorage.getItem(taskKey)) || [];
+        return tasks.find(task => task.id === taskId);
+    }
+
 </script>
 
 </html>
