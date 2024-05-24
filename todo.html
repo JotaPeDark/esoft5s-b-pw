@@ -73,8 +73,6 @@
             border-radius: 5px;
         }
 
-        /* styles.css */
-
         li {
             position: relative;
         }
@@ -93,6 +91,48 @@
         li button.edit-btn:hover {
             background-color: #575757;
         }
+
+        dialog {
+            border: none;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 1rem;
+        }
+
+        dialog form {
+            display: grid;
+            gap: 1rem;
+        }
+
+        dialog form input[type="text"],
+        dialog form textarea {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        dialog form button {
+            background-color: #333;
+            color: #fff;
+            border: none;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        dialog form button:hover {
+            background-color: #555;
+        }
+
+        dialog form button[type="button"] {
+            background-color: #676767;
+        }
+
+        dialog form button[type="button"]:hover {
+            background-color: #575757;
+        }
     </style>
 </head>
 
@@ -105,8 +145,7 @@
             <!-- Formulário para adicionar tarefas -->
             <form id="taskForm" onsubmit="addTask(event)">
                 <input type="text" name="title" id="title" required placeholder="Informe o título da tarefa" />
-                <textarea id="description" name="description" required
-                    placeholder="Informe a descrição da tarefa"></textarea>
+                <textarea id="description" name="description" required placeholder="Informe a descrição da tarefa"></textarea>
                 <button type="submit">Salvar Tarefa</button>
             </form>
 
@@ -126,80 +165,74 @@
         <footer>&copy; 2024 Todo List</footer>
     </div>
 
-    <script src="./index.js"></script>
-    <script src="../../footer-counter.js"></script>
-</body>
+    <script>
+        const taskKey = "@tasks";
 
-<script>
-    // JavaScript
+        // Função para adicionar tarefa
+        function addTask(event) {
+            event.preventDefault(); // Evita o recarregamento da página
+            const taskId = new Date().getTime();
+            const taskList = document.querySelector("#taskList");
 
-    const taskKey = "@tasks";
+            const form = document.querySelector("#taskForm");
+            const formData = new FormData(form);
 
-    // Função para adicionar tarefa
-    function addTask(event) {
-        event.preventDefault(); // Evita o recarregamento da página
-        const taskId = new Date().getTime();
-        const taskList = document.querySelector("#taskList");
+            const taskTitle = formData.get("title");
+            const taskDescription = formData.get("description");
 
-        const form = document.querySelector("#taskForm");
-        const formData = new FormData(form);
+            const li = document.createElement("li");
+            li.id = taskId;
+            li.innerHTML = `
+                <h2>${taskTitle}</h2>
+                <p>${taskDescription}</p>
+                <button class="edit-btn" title="Editar tarefa" onclick="abrirDialog(${taskId})">✏️</button>
+            `;
 
-        const taskTitle = formData.get("title");
-        const taskDescription = formData.get("description");
+            taskList.appendChild(li);
 
-        const li = document.createElement("li");
-        li.id = taskId;
-        li.innerHTML = `
-      <h2>${taskTitle}</h2>
-      <p>${taskDescription}</p>
-      <button class="edit-btn" title="Editar tarefa" onclick="abrirDialog(${taskId})">✏️</button>
-  `;
+            // Salvar tarefas no localStorage
+            const tasks = JSON.parse(localStorage.getItem(taskKey)) || [];
+            tasks.push({ id: taskId, title: taskTitle, description: taskDescription });
+            localStorage.setItem(taskKey, JSON.stringify(tasks));
 
-        taskList.appendChild(li);
-
-        // Salvar tarefas no localStorage
-        const tasks = JSON.parse(localStorage.getItem(taskKey)) || [];
-        tasks.push({ id: taskId, title: taskTitle, description: taskDescription });
-        localStorage.setItem(taskKey, JSON.stringify(tasks));
-
-        form.reset();
-    }
-
-    // Carregar tarefas do localStorage ao recarregar a página
-    window.addEventListener("DOMContentLoaded", () => {
-        const tasks = JSON.parse(localStorage.getItem(taskKey)) || [];
-        const taskList = document.querySelector("#taskList");
-        taskList.innerHTML = tasks
-            .map(
-                (task) =>
-                    `<li id="${task.id}"><h2>${task.title}</h2><p>${task.description}</p><button class="edit-btn" title="Editar tarefa" onclick="abrirDialog(${task.id})">✏️</button></li>`
-            )
-            .join("");
-    });
-
-    function abrirDialog(taskId) {
-        const dialog = document.querySelector("#editDialog");
-        const task = getTaskById(taskId);
-
-        if (task) {
-            const editForm = document.querySelector("#editForm");
-            editForm.elements["editTitle"].value = task.title;
-            editForm.elements["editDescription"].value = task.description;
-
-            dialog.showModal();
+            form.reset();
         }
-    }
 
-    function fecharDialog() {
-        const dialog = document.querySelector("#editDialog");
-        dialog.close();
-    }
+        // Carregar tarefas do localStorage ao recarregar a página
+        window.addEventListener("DOMContentLoaded", () => {
+            const tasks = JSON.parse(localStorage.getItem(taskKey)) || [];
+            const taskList = document.querySelector("#taskList");
+            taskList.innerHTML = tasks
+                .map(
+                    (task) =>
+                        `<li id="${task.id}"><h2>${task.title}</h2><p>${task.description}</p><button class="edit-btn" title="Editar tarefa" onclick="abrirDialog(${task.id})">✏️</button></li>`
+                )
+                .join("");
+        });
 
-    function getTaskById(taskId) {
-        const tasks = JSON.parse(localStorage.getItem(taskKey)) || [];
-        return tasks.find(task => task.id === taskId);
-    }
+        function abrirDialog(taskId) {
+            const dialog = document.querySelector("#editDialog");
+            const task = getTaskById(taskId);
 
-</script>
+            if (task) {
+                const editForm = document.querySelector("#editForm");
+                editForm.elements["editTitle"].value = task.title;
+                editForm.elements["editDescription"].value = task.description;
+
+                dialog.showModal();
+            }
+        }
+
+        function fecharDialog() {
+            const dialog = document.querySelector("#editDialog");
+            dialog.close();
+        }
+
+        function getTaskById(taskId) {
+            const tasks = JSON.parse(localStorage.getItem(taskKey)) || [];
+            return tasks.find(task => task.id === taskId);
+        }
+    </script>
+</body>
 
 </html>
