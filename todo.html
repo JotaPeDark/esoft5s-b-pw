@@ -1,255 +1,278 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TO DO</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Todo List</title>
     <style>
+        /* Reset de estilos para garantir consistência em diferentes navegadores */
+        body,
+        h1,
+        h2,
+        p,
+        ul,
+        ol,
+        li,
+        figure,
+        table,
+        th,
+        td {
+          margin: 0;
+          padding: 0;
+        }
+
+        * {
+          box-sizing: border-box;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f9f9f9;
-            margin: 0;
-            padding: 0;
+          font-family: 'Arial', sans-serif;
+          color: #333;
+          background-color: #f4f4f4;
+          height: 100vh;
+          display: flex;
+          flex-direction: column;
         }
 
         .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
+          display: grid;
+          grid-template-rows: auto 1fr auto;
+          min-height: 100vh;
         }
 
-        header {
-            background-color: #333;
-            color: #fff;
-            padding: 20px;
-            text-align: center;
-            border-radius: 5px 5px 0 0;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        }
-
+        header,
         footer {
-            background-color: #333;
-            color: #fff;
-            text-align: center;
-            padding: 20px;
-            border-radius: 0 0 5px 5px;
-            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
+          background-color: #333;
+          color: #fff;
+          padding: 20px;
+          text-align: center;
         }
 
-        #taskForm {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
+        main {
+          padding: 1rem;
         }
 
-        #taskForm input[type="text"],
-        #taskForm textarea {
-            width: calc(100% - 22px);
-            padding: 10px;
-            margin-bottom: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            outline: none;
+        main form {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          align-items: center;
+          width: 40ch;
+          margin: 0 auto;
         }
 
-        #taskForm input[type="submit"] {
-            background-color: #333;
-            color: #fff;
-            border: none;
-            padding: 10px 20px;
-            cursor: pointer;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
-            outline: none;
+        input,
+        textarea {
+          width: 100%;
+          padding: 0.5rem;
+          font-size: 16px;
         }
 
-        #taskForm input[type="submit"]:hover {
-            background-color: #555;
+        input,
+        textarea::placeholder {
+          font-family: 'Arial', sans-serif;
         }
 
-        #taskList {
-            list-style-type: none;
-            padding: 0;
+        button {
+          background-color: #0074d9;
+          color: #fff;
+          border: none;
+          padding: 0.5rem 1rem;
+          cursor: pointer;
         }
 
-        .tarefa {
-            background-color: #fff;
-            padding: 20px;
-            margin-bottom: 20px;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            position: relative;
+        ul {
+          list-style: none;
+          padding: 0;
+          max-width: 80ch;
+          margin: 0 auto;
         }
 
-        .tarefa:hover {
-            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+        li {
+          margin: 0.5rem 0;
+          padding: 20px;
+          border: solid 1px #ccc;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
         }
 
-        .edit-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background-color: #676767;
-            border: none;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            color: white;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
+        li div {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
         }
 
-        .edit-btn:hover {
-            background-color: #575757;
+        li p {
+          white-space: pre-wrap;
+          margin-top: 10px;
+        }
+
+        li button {
+          background-color: #676767;
+          border: none;
+          padding: 0.5rem 1rem;
+          cursor: pointer;
+          border-radius: 5px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        li button.delete {
+          background-color: #dc3545;
+        }
+
+        li button.delete:hover {
+          background-color: #c82333;
         }
 
         dialog {
-            border: none;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-            padding: 20px;
-        }
-
-        dialog form {
-            display: grid;
-            gap: 10px;
-        }
-
-        dialog form input[type="text"],
-        dialog form textarea {
-            width: calc(100% - 22px);
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            outline: none;
-        }
-
-        dialog form button {
-            background-color: #333;
-            color: #fff;
-            border: none;
-            padding: 10px 20px;
-            cursor: pointer;
-            border-radius: 5px;
-            transition: background-color 0.3s ease;
-            outline: none;
-        }
-
-        dialog form button:hover {
-            background-color: #555;
-        }
-
-        dialog form button[type="button"] {
-            background-color: #676767;
-        }
-
-        dialog form button[type="button"]:hover {
-            background-color: #575757;
+          border-radius: 5px;
+          padding: 20px;
         }
     </style>
 </head>
-
 <body>
     <div class="container">
         <header>
-            <h1 style="margin: 0;">Todo List</h1>
+            <h1>Todo List</h1>
         </header>
         <main>
-            <!-- Formulário para adicionar tarefas -->
+            <dialog>
+                <form id="editTaskForm" onsubmit="editTask(event)">
+                    <input type="text" name="title" id="editTitle" required placeholder="Informe o título da tarefa" />
+                    <textarea id="editDescription" name="description" required placeholder="Informe a descrição da tarefa"></textarea>
+                    <div>
+                        <button type="submit">Editar Tarefa</button>
+                        <button type="button" onclick="closeDialog()">Cancelar</button>
+                    </div>
+                </form>
+            </dialog>
+
             <form id="taskForm" onsubmit="addTask(event)">
                 <input type="text" name="title" id="title" required placeholder="Informe o título da tarefa" />
                 <textarea id="description" name="description" required placeholder="Informe a descrição da tarefa"></textarea>
                 <button type="submit">Salvar Tarefa</button>
             </form>
 
-            <!-- Lista de tarefas -->
             <ul id="taskList"></ul>
-
-            <!-- Dialog para editar tarefas -->
-            <dialog id="editDialog">
-                <form id="editForm">
-                    <input type="text" name="editTitle" id="editTitle" required placeholder="Informe o título da tarefa" />
-                    <textarea id="editDescription" name="editDescription" required placeholder="Informe a descrição da tarefa"></textarea>
-                    <button type="submit">Editar</button>
-                    <button type="button" onclick="fecharDialog()">Cancelar</button>
-                </form>
-            </dialog>
         </main>
         <footer>&copy; 2024 Todo List</footer>
     </div>
 
     <script>
-        const taskKey = "@tasks";
+        const taskKey = '@tasks';
 
-        // Função para adicionar tarefa
+        let selectedTaskId = null;
+
         function addTask(event) {
-            event.preventDefault(); // Evita o recarregamento da página
+            event.preventDefault();
             const taskId = new Date().getTime();
-            const taskList = document.querySelector("#taskList");
+            const taskList = document.querySelector('#taskList');
 
-            const form = document.querySelector("#taskForm");
+            const form = document.querySelector('#taskForm');
             const formData = new FormData(form);
 
-            const taskTitle = formData.get("title");
-            const taskDescription = formData.get("description");
+            const taskTitle = formData.get('title');
+            const taskDescription = formData.get('description');
 
-            const li = document.createElement("li");
-            li.className = "tarefa";
-            li.id = taskId;
+            const li = document.createElement('li');
+
+            li.id = `id-${taskId}`;
             li.innerHTML = `
-                <h2>${taskTitle}</h2>
-                <p>${taskDescription}</p>
-                <button class="edit-btn" title="Editar tarefa" onclick="abrirDialog(${taskId})">✏️</button>
+                <div>
+                    <h2>${taskTitle}</h2>
+                    <p>${taskDescription}</p>
+                </div>
+                <button title="Editar tarefa" onclick="openEditDialog(${taskId})">✏️</button>
+                <button class="delete" title="Excluir tarefa" onclick="deleteTask(${taskId})">❌</button>
             `;
 
             taskList.appendChild(li);
 
-            // Salvar tarefas no localStorage
             const tasks = JSON.parse(localStorage.getItem(taskKey)) || [];
-            tasks.push({ id: taskId, title: taskTitle, description: taskDescription });
+            tasks.push({
+                id: taskId,
+                title: taskTitle,
+                description: taskDescription,
+            });
             localStorage.setItem(taskKey, JSON.stringify(tasks));
 
             form.reset();
         }
 
-        // Carregar tarefas do localStorage ao recarregar a página
-        window.addEventListener("DOMContentLoaded", () => {
+        function openEditDialog(taskId) {
             const tasks = JSON.parse(localStorage.getItem(taskKey)) || [];
-            const taskList = document.querySelector("#taskList");
-            taskList.innerHTML = tasks
-                .map(
-                    (task) =>
-                        `<li class="tarefa" id="${task.id}"><h2>${task.title}</h2><p>${task.description}</p><button class="edit-btn" title="Editar tarefa" onclick="abrirDialog(${task.id})">✏️</button></li>`
-                )
-                .join("");
-        });
 
-        function abrirDialog(taskId) {
-            const dialog = document.querySelector("#editDialog");
-            const task = getTaskById(taskId);
+            selectedTaskId = tasks.findIndex((task) => task.id === taskId);
+            const task = tasks[selectedTaskId];
 
-            if (task) {
-                const editForm = document.querySelector("#editForm");
-                editForm.elements["editTitle"].value = task.title;
-                editForm.elements["editDescription"].value = task.description;
+            const dialog = document.querySelector('dialog');
 
-                dialog.showModal();
-            }
+            const editTitle = document.querySelector('#editTaskForm #editTitle');
+            const editDescription = document.querySelector('#editTaskForm #editDescription');
+
+            editTitle.value = task.title;
+            editDescription.value = task.description;
+
+            dialog.showModal();
         }
 
-        function fecharDialog() {
-            const dialog = document.querySelector("#editDialog");
+        function closeDialog() {
+            const dialog = document.querySelector('dialog');
             dialog.close();
         }
 
-        function getTaskById(taskId) {
+        function editTask(event) {
+            event.preventDefault();
             const tasks = JSON.parse(localStorage.getItem(taskKey)) || [];
-            return tasks.find(task => task.id === taskId);
+            const formData = new FormData(document.querySelector('#editTaskForm'));
+
+            tasks[selectedTaskId].title = formData.get('title');
+            tasks[selectedTaskId].description = formData.get('description');
+
+            localStorage.setItem(taskKey, JSON.stringify(tasks));
+
+            const taskList = document.querySelector('#taskList');
+            taskList.innerHTML = tasks.map(task => `
+                <li id='id-${task.id}'>
+                    <div>
+                        <h2>${task.title}</h2>
+                        <p>${task.description}</p>
+                    </div>
+                    <button title="Editar tarefa" onclick="openEditDialog(${task.id})">✏️</button>
+                    <button class="delete" title="Excluir tarefa" onclick="deleteTask(${task.id})">❌</button>
+                </li>
+            `).join('');
+
+            closeDialog();
         }
+
+        function deleteTask(taskId) {
+            let tasks = JSON.parse(localStorage.getItem(taskKey)) || [];
+            tasks = tasks.filter(task => task.id !== taskId);
+            localStorage.setItem(taskKey, JSON.stringify(tasks));
+
+            const taskElement = document.getElementById(`id-${taskId}`);
+            taskElement.remove();
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const tasks = JSON.parse(localStorage.getItem(taskKey)) || [];
+            const taskList = document.querySelector('#taskList');
+
+            taskList.innerHTML = tasks.map(task => `
+                <li id='id-${task.id}'>
+                    <div>
+                        <h2>${task.title}</h2>
+                        <p>${task.description}</p>
+                    </div>
+                    <button title="Editar tarefa" onclick="openEditDialog(${task.id})">✏️</button>
+                    <button class="delete" title="Excluir tarefa" onclick="deleteTask(${task.id})">❌</button>
+                </li>
+            `).join('');
+        });
     </script>
 </body>
-
 </html>
